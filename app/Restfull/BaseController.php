@@ -1,0 +1,213 @@
+<?php
+namespace Appkita\CI4Restfull;
+
+use \CodeIgniter\Controller;
+use \CodeIgniter\HTTP\RequestInterface;
+use \CodeIgniter\HTTP\ResponseInterface;
+use \Psr\Log\LoggerInterface;
+use \Appkita\PHPAuth\Authentication;
+use \Appkita\PHPAuth\METHOD;
+use \Appkita\CI4Restfull\Auth;
+
+abstract class BaseController extends Controller
+{
+    /**
+     * @var array 
+     */
+    protected $_auth = ['jwt', 'basic', 'digest', 'key'];
+    protected $user_api = [];
+	/**
+	 * @var string|null The model that holding this resource's data
+	 */
+	protected $modelName;
+
+	/**
+	 * @var object|null The model that holding this resource's data
+	 */
+	protected $model;
+    private $error_auth = 'Not Authentication';
+	/**
+	 * Constructor.
+	 *
+	 * @param RequestInterface  $request
+	 * @param ResponseInterface $response
+	 * @param LoggerInterface   $logger
+	 */
+	public function initController(RequestInterface $request, ResponseInterface $response, LoggerInterface $logger)
+	{
+		parent::initController($request, $response, $logger);
+
+		// instantiate our model, if needed
+		$this->setModel($this->modelName);
+        $this->authentication($this->_auth);
+	}
+
+    private function failOutput($code = 401, $message= '') {
+        \http_response_code($code);
+        echo \json_encode(['status'=>$code, 'message'=>$message]);
+        die();
+    }
+
+    private function cekAuthType($type = 'key') {
+        $config = new \Config\Restfull();
+        $user_config = $config->user_config;
+        $PHPAUTH = new Authentication($config);
+        $auth = Auth::init($config);
+        switch (\strtolower($type)) {
+            case 'key':
+                $user=  $PHPAUTH->auth(METHOD::KEY, function($key) {
+                    return Auth::key($key);
+                });
+            break;
+            case 'basic':
+                $user = $PHPAUTH->auth(METHOD::BASIC, function($username, $password) {
+                    return Auth::basic($username, $password);
+                });
+            break;
+            case 'digest':
+                $user = $PHPAUTH->auth(METHOD::DIGEST, function($username, $password) {
+                    $_user = Auth::digest($username, $password);
+                    if ($_user != false) {
+                          return ['username'=>$_user[$user_config['username_coloumn']], 'password'=>$_user[$user_config['password_coloumn']]];
+                    } else {
+                        return false;
+                    }
+                });
+            break;
+            case 'jwt':
+                $user = $PHPAUTH->auth(METHOD::TOKEN, function($key) {
+                    return Auth::token($key);
+                });
+            break;
+            default:
+             $user=  $PHPAUTH->auth(METHOD::KEY, function($key) {
+                    return Auth::key($key);
+                });
+        }
+        if ($user == false) {
+            $this->error_auth = 'Not Authentication';
+            return false;
+        }
+        $whitelist = $this->cekWhitelist($user[$user_config['whitelist_coloumn']]);
+        if (!$whitelist) {
+            if (!$this->cekBlacklist($user[$user_config['blacklist_coloumn']])) {
+                $this->error_auth = 'Is IP Adress blacklist from sistem, contact Administrator System';
+                return false;
+            }
+        }
+        if ($this->cekPath($user[$user_config['path_coloumn']])) {
+            $this->user_api = $user;
+            if (\strtolower($type) == 'digest') {
+                return ['username'=>$user[$user_config['username_coloumn']], 'password'=>$user[$user_config['password_coloumn']]];
+            } else {
+                return $this->user_api;
+            }
+        } else {
+             $this->error_auth = 'Not Authentication';
+            return false;
+        }
+    }
+
+    private function cekPath($list) {
+        if ($list == '*') {
+            return true;
+        } else if(\is_array($list)) {
+            $class = $this->router->controllerName();
+            $method = $this->router->methodName();
+            $class = \str_replace(' ', '', $class);
+            $class = \str_replace(APPPNAMESPACE, '', $class);
+            $class = \str_replace('Controllers', '', $class);
+            $class = \str_replace('controllers', '', $class);
+            $class = \str_replace('\\', '', $class);
+            $path = $class.'_'.$method;
+            if (\in_array(\strtolower($path), $list)) {
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
+
+    private function cekBlacklist($list) {
+        $ip = $this->requiest->getIPAddress();
+        if (\in_array($ip, $list)) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    private function cekWhitelist($list) {
+        $ip = $this->requiest->getIPAddress();
+        if (\in_array($ip, $list)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    protected function authentication($config = null) {
+        if (!empty($config)) {
+            $this->setAuth($config);
+        }
+        $status = false;
+        for($i = 0; $i < sizeof($this->_auth); $i++) {
+            $status = $this->cekAuthType($this->_auth[$i]);
+            if ($status) {
+                return true;
+                break;
+            } else{
+                $status = false;
+                continue;
+            }
+        }
+        if (!$status) {
+            return $this->failOutput(401, $this->error_auth);
+        }
+    }
+
+    protected function setAuth($auth) {
+        if (\is_string($auth)) {
+            $this->_auth = [$auth];
+        }else if (\is_object($auth)) {
+            $this->_auth = (array) $auth;
+        } else{
+            $this->_auth = $auth;
+        }
+        return $this;
+    }
+	/**
+	 * Set or change the model this controller is bound to.
+	 * Given either the name or the object, determine the other.
+	 *
+	 * @param object|string|null $which
+	 *
+	 * @return void
+	 */
+	public function setModel($which = null)
+	{
+		// save what we have been given
+		if ($which)
+		{
+			$this->model     = is_object($which) ? $which : null;
+			$this->modelName = is_object($which) ? null : $which;
+		}
+
+		// make a model object if needed
+		if (empty($this->model) && ! empty($this->modelName))
+		{
+			if (class_exists($this->modelName))
+			{
+				$this->model = model($this->modelName);
+			}
+		}
+
+		// determine model name if needed
+		if (! empty($this->model) && empty($this->modelName))
+		{
+			$this->modelName = get_class($this->model);
+		}
+	}
+}

@@ -1,0 +1,42 @@
+{
+	"name": "appkita/ci4restfull",
+	"type": "project",
+	"description": "CodeIgniter4 starter Restfull API",
+	"homepage": "https://app-kita.com",
+	"license": "MIT",
+	"require": {
+		"php": "^7.3||^8.0",
+		"codeigniter4/framework": "^4",
+		"appkita/phpauth": "^0.1.0"
+	},
+	"require-dev": {
+		"fakerphp/faker": "^1.9",
+		"mikey179/vfsstream": "^1.6",
+		"phpunit/phpunit": "^9.1"
+	},
+	"suggest": {
+		"ext-fileinfo": "Improves mime type detection for files"
+	},
+	"autoload": {
+		"psr-4": {
+			"App\\": "app",
+			"Config\\": "app/Config"
+		},
+		"exclude-from-classmap": [
+			"**/Database/Migrations/**"
+		]
+	},
+	"autoload-dev": {
+		"psr-4": {
+			"Tests\\Support\\": "tests/_support"
+		}
+	},
+	"scripts": {
+		"test": "phpunit"
+	},
+	"support": {
+		"forum": "http://forum/app-kita.com/",
+		"source": "https://github.com/gunantos/CI4RESTFULL",
+		"slack": "app-kita.slack.com"
+	}
+}
