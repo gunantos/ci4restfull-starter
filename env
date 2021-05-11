@@ -122,7 +122,7 @@
 
 # logger.threshold = 4
 
-restfull.cekfrom=database #database or file
+restfull.cekfrom=file #database or file
 #restfull.file.config = Restuser
 restfull.database.group=default
 restfull.database.model=UserModel

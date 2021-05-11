@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "2d7ebee9874e940a48f159730d266a3a",
+    "content-hash": "a54c2006c5102e88329eb7f1264f628c",
     "packages": [
         {
             "name": "appkita/phpauth",
-            "version": "0.1.0",
+            "version": "0.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/gunantos/PHP_AUTHENTICATION.git",
-                "reference": "d99d5bc7acbd7a5222171e52465a464864e7f31a"
+                "reference": "9cf21d08a8371e02656b87fab8f5c5bf1232c794"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/gunantos/PHP_AUTHENTICATION/zipball/d99d5bc7acbd7a5222171e52465a464864e7f31a",
-                "reference": "d99d5bc7acbd7a5222171e52465a464864e7f31a",
+                "url": "https://api.github.com/repos/gunantos/PHP_AUTHENTICATION/zipball/9cf21d08a8371e02656b87fab8f5c5bf1232c794",
+                "reference": "9cf21d08a8371e02656b87fab8f5c5bf1232c794",
                 "shasum": ""
             },
             "require": {
@@ -57,9 +57,9 @@
             ],
             "support": {
                 "issues": "https://github.com/gunantos/PHP_AUTHENTICATION/issues",
-                "source": "https://github.com/gunantos/PHP_AUTHENTICATION/tree/0.1.0"
+                "source": "https://github.com/gunantos/PHP_AUTHENTICATION/tree/0.1.1"
             },
-            "time": "2021-05-10T10:01:09+00:00"
+            "time": "2021-05-11T11:53:57+00:00"
         },
         {
             "name": "codeigniter4/framework",

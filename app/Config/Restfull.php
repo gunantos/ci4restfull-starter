@@ -8,7 +8,7 @@ class Restfull extends BaseConfig
     /**
      * @var String $cekfrom | database or file
      */
-    public $cekfrom = 'database';
+    public $cekfrom = 'file';
     
     /**
      * @var Array $user_config  
@@ -25,8 +25,10 @@ class Restfull extends BaseConfig
       'blacklist_coloumn'=>'blacklist'
     ];
     
-    
-
+    /**
+     * @var array $UserModel
+     * list user api if you using file configuration 
+     */
     public $UserModel = [
       [
         'email'=>'user@email.com',
@@ -46,10 +48,27 @@ class Restfull extends BaseConfig
 
     public $headerKey = 'X-API-KEY';
 
+    /**
+     * @var array $allowed_key_parameter
+     * if you API KEY allowed get from parameter GET, POST, or JSON
+     */
+    public $allowed_key_parameter = ['get', 'post', 'json'];
+
+    /**
+     * @var string $token_data
+     * Data include to token
+     */
     public $token_data = 'username';
 
+    /**
+     * @var Array $allowed_format
+     * allowe format output
+     */
     public $allowed_format = ['json', 'xml', 'csv'];
 
+    /**
+     * @var string $default_format
+     */
     public $default_format = 'json';
 
     public $default_message_error = [

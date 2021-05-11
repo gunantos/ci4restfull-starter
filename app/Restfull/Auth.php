@@ -43,7 +43,7 @@ Class Auth {
             $user[$config['path_coloumn']] = array_filter(\explode(';', $user[$config['path_coloumn']]));
         }
         if ($password != false) {
-            if (\password_verify($password, $user[$config['password']])) {
+            if (\password_verify($password, $user[$config['password_coloumn']])) {
                 return $user;
             } else {
                 return ErrorOutput::error401();
@@ -56,22 +56,21 @@ Class Auth {
     private static function fileCek($username=false, $password=false, $key =false) {
         $config = Auth::$config;
         $user_list = Auth::$base_config->{$config['model']};
-
         if ($username) {
-            $indeks = array_search($username, array_column($user_list, $config['username']));
+            $indeks = array_search($username, array_column($user_list, $config['username_coloumn']));
         } else if ($key) {
-            $indeks = array_search($key, array_column($user_list, $config['key']));
+            $indeks = array_search($key, array_column($user_list, $config['key_coloumn']));
         } else {
             return false;
         }
         $user = [];
-        if ($indeks == false || $indeks < 0) {
+        if ($indeks === false || $indeks < 0) {
             return false;
         }else{
             $user = $user_list[$indeks];
         }
         if ($password != false) {
-            if ($user[$config['password']] !== $password) {
+            if ($user[$config['password_coloumn']] !== $password) {
                 return ErrorOutput::error401();
              }
         }

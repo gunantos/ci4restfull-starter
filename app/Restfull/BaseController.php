@@ -39,7 +39,6 @@ abstract class BaseController extends Controller
 	public function initController(RequestInterface $request, ResponseInterface $response, LoggerInterface $logger)
 	{
 		parent::initController($request, $response, $logger);
-
 		// instantiate our model, if needed
 		$this->setModel($this->modelName);
         $this->authentication($this->_auth);
@@ -68,7 +67,7 @@ abstract class BaseController extends Controller
         $config = new \Config\Restfull();
         $user_config = $config->user_config;
         $PHPAUTH = new Authentication($config);
-        $auth = Auth::init($config);
+        $auth = Auth::init($config); 
         switch (\strtolower($type)) {
             case 'key':
                 $user=  $PHPAUTH->auth(METHOD::KEY, function($key) {
@@ -101,14 +100,12 @@ abstract class BaseController extends Controller
                 });
         }
         if ($user == false) {
-            $this->error_auth = 'Not Authentication';
-            return false;
+             return ErrorOutput::error401();
         }
         $whitelist = $this->cekWhitelist($user[$user_config['whitelist_coloumn']]);
         if (!$whitelist) {
             if (!$this->cekBlacklist($user[$user_config['blacklist_coloumn']])) {
-                $this->error_auth = 'Is IP Adress blacklist from sistem, contact Administrator System';
-                return false;
+                return ErrorOutput::error401('Is IP Adress blacklist from sistem, contact Administrator System');
             }
         }
         if ($this->cekPath($user[$user_config['path_coloumn']])) {
@@ -119,8 +116,7 @@ abstract class BaseController extends Controller
                 return $this->user_api;
             }
         } else {
-             $this->error_auth = 'Not Authentication';
-            return false;
+            return ErrorOutput::error401();
         }
     }
 
@@ -147,7 +143,7 @@ abstract class BaseController extends Controller
     }
 
     private function cekBlacklist($list) {
-        $ip = $this->requiest->getIPAddress();
+        $ip = $this->request->getIPAddress();
         if (\in_array($ip, $list)) {
             return false;
         } else {
@@ -156,7 +152,7 @@ abstract class BaseController extends Controller
     }
 
     private function cekWhitelist($list) {
-        $ip = $this->requiest->getIPAddress();
+        $ip = $this->request->getIPAddress();
         if (\in_array($ip, $list)) {
             return true;
         } else {
@@ -178,17 +174,15 @@ abstract class BaseController extends Controller
             return true;
         }
         $status = false;
-        for($i = 0; $i < sizeof($this->_auth); $i++) {
+        $i = 0;
+        while($status == false && $i < sizeof($this->_auth)) {
             $status = $this->cekAuthType($this->_auth[$i]);
-            if ($status) {
-                return true;
-                break;
-            } else{
-                $status = false;
-                continue;
-            }
+            $i++;
         }
-        if (!$status) {
+        if ($status) {
+            $this->user_api = $status;
+            return true;
+        } else {
             return ErrorOutput::error401();
         }
     }
