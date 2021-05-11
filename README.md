@@ -8,12 +8,10 @@ follow Setup Configuration!
 
 ## Installation & updates
 
-Now is Beta Version
-
 - composer
 
 ```sh
-composer create-project appkita/ci4restfull-starter@v1.0-BETA
+composer create-project appkita/ci4restfull-starter
 cd ci4restfull-starter
 composer update
 ```
