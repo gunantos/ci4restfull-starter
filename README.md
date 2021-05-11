@@ -115,14 +115,6 @@ composer update
          * @return mixed
          */
        public function create(){}
-            /**
-       * Return the editable properties of a resource object
-       *
-       * @param mixed $id
-       *
-       * @return mixed
-       */
-      public function edit($id = null){}
 
         /**
        * Add or update a model resource, from "posted" properties
@@ -140,19 +132,6 @@ composer update
 	    * @return mixed
 	    */
 	    public function delete($id = null){}
-
-    }
-    /**
-	 * Delete the designated resource object from the model
-	 *
-	 * @param mixed $id
-	 *
-	 * @return mixed
-	 */
-	public function delete($id = null)
-	{
-		return $this->respond(['status'=>200, 'data'=>$this->model->delete($id)]);
-	}
 }
 ```
 

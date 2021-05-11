@@ -20,15 +20,20 @@ class Home extends RestfullApi
 		return $this->respond(['status'=>true, 'data'=>$this->model->findAll()]);
 	}
 
+	public function show($id = null)
+	{
+		return $this->respond(['status'=>true, 'data'=>$this->model->find($id)]);
+	}
+
 	public function create() {
 		die('create ');
 	}
 
-	public function update($id = '') {
+	public function update($id = null) {
 		die('update '. $id);
 	}
 
-	public function deleted($id ='') {
+	public function deleted($id = null) {
 		die('deleted '. $id);
 	}
 }
