@@ -3,6 +3,10 @@
 
 Codeigniter 4 Restfull is the creation of Restfull API with the codeigniter 4 framework. Use is very simple and easy to use. And support with 4 types of security authentication ex. JWT, Basic, Key, Token
 
+You can manage api using database or File configuration
+
+follow Setup Configuration!
+
 ## Installation & updates
 
 Now is Beta Version
@@ -21,14 +25,47 @@ composer update
 
 ## Setup
 
-- Copy `env` to `.env` and tailor for your app, specifically the baseURL
-and any database settings.
+- Copy `env` to `.env` and tailor for your app, specifically the baseURL, any database settings and Restfull setting.
 
 `or`
 
 - Open Folder `App/Config/Restfull` and edit 
-
-- Create new Controller extends `RestfullApi` and followed Restf
+```php
+   //you can set database of file
+   public $cekfrom = 'file'
+   
+   //configuration user cek
+  public $user_config = [
+      'model' => 'UserModel', //model name or parameter if you using file
+      'username_coloumn'=>'email',
+      'password_coloumn'=>'password',
+      'key_coloumn' => 'apikey',
+      'path_coloumn'=>'path',
+      'block_coloumn'=>'isblock',
+      'whitelist_coloumn'=>'whitelist',
+      'blacklist_coloumn'=>'blacklist'
+    ];
+    
+    //if you using file $cekfrom
+    $UserModel = [
+   	[
+        'email'=>'user@email.com',
+        'password'=>'password',
+        'key'=>'123123',
+        'block'=>false,  //if you block return true
+        'whitelist'=>[], //add whitelist ip address
+        'blacklist'=>[], //add blacklist ip address
+        'path'=>'*' //use * for allow all access or array controllername_methodname 
+      ]
+     ]
+    
+    //Configuration your Header API KEY
+    public $haderKey = 'X-API-KEY'l
+    
+    //configuration data include on json token
+   $token_data = 'username';
+```
+- Create new Controller extends `RestfullApi`
 ```php
   <?php
     namespace App\Controllers;
@@ -84,6 +121,18 @@ and any database settings.
 	    public function delete($id = null){}
       
     }
+    /**
+	 * Delete the designated resource object from the model
+	 *
+	 * @param mixed $id
+	 *
+	 * @return mixed
+	 */
+	public function delete($id = null)
+	{
+		return $this->respond(['status'=>200, 'data'=>$this->model->delete($id)]);
+	}
+}
 ```
 - Run application with `spark` or `host`
 ```sh
