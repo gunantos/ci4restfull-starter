@@ -51,8 +51,8 @@ composer update
    	[
         'email'=>'user@email.com',
         'password'=>'password',
-        'key'=>'123123',
-        'block'=>false,  //if you block return true
+        'apikey'=>'123123',
+        'isblock'=>false,  //if you block return true
         'whitelist'=>[], //add whitelist ip address
         'blacklist'=>[], //add blacklist ip address
         'path'=>'*' //use * for allow all access or array controllername_methodname 
