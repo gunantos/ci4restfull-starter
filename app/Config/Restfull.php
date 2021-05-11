@@ -15,7 +15,7 @@ class Restfull extends BaseConfig
      * Configuration user check
     */
      public $user_config = [
-      'model' => 'RestUser',
+      'model' => 'UserModel',
       'username_coloumn'=>'email',
       'password_coloumn'=>'password',
       'key_coloumn' => 'apikey',
@@ -27,7 +27,7 @@ class Restfull extends BaseConfig
     
     
 
-    public $RestUser = [
+    public $UserModel = [
       [
         'email'=>'user@email.com',
         'password'=>'password',
@@ -44,11 +44,29 @@ class Restfull extends BaseConfig
      * Header Authentication API KEY
      */
 
-    public $headerKey = 'X-TTPG-KEY';
+    public $headerKey = 'X-API-KEY';
 
     public $token_data = 'username';
 
     public $allowed_format = ['json', 'xml', 'csv'];
 
     public $default_format = 'json';
+
+    public $default_message_error = [
+      '400' => 'Bad Request',
+      '401' => 'Not Authentication',
+      '402' => 'Payment Required',
+      '403' => 'You request is Forbidden',
+      '404' => 'URL Not Found',
+      '405' => 'Method Not Allowed by system',
+      '406' => 'You request not Acceptable',
+      '408' => 'Request Timeout',
+      '500' => 'Internal Server Error',
+      '501' => 'Not Implemented',
+      '502' => 'Bad Gateway',
+      '503' => 'Service Unavailable',
+      '504' => 'Gateway Timeout',
+      '505' => 'HTTP Version not Supporterd',
+      '511' => 'Network Authentication Required'
+    ];
 }

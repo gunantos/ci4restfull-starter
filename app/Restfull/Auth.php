@@ -1,6 +1,7 @@
 <?php
 
 namespace Appkita\CI4Restfull;
+use \Appkita\CI4Restfull\ErrorOutput;
 
 Class Auth {
     private static $base_config = [];
@@ -41,11 +42,11 @@ Class Auth {
         if ($user[$config['path_coloumn']] != '*') {
             $user[$config['path_coloumn']] = array_filter(\explode(';', $user[$config['path_coloumn']]));
         }
-        if ($password) {
+        if ($password != false) {
             if (\password_verify($password, $user[$config['password']])) {
                 return $user;
             } else {
-                return false;
+                return ErrorOutput::error401();
             }
         } else {
             return $user;
@@ -69,10 +70,10 @@ Class Auth {
         }else{
             $user = $user_list[$indeks];
         }
-        if ($password) {
+        if ($password != false) {
             if ($user[$config['password']] !== $password) {
-                return false;
-            }
+                return ErrorOutput::error401();
+             }
         }
         return $user;
     }
@@ -86,18 +87,18 @@ Class Auth {
     }
 
     public static function key($key) {
-        return Auth::cek('', '', $key);
+        return Auth::cek(false, false, $key);
     }
 
     public static function basic($username, $password) {
-        return Auth::cek($username, $password, ''); 
+        return Auth::cek($username, $password, false); 
     }
 
     public static function digest($username, $password = null) {
-        return Auth::cek($username, $password, ''); 
+        return Auth::cek($username, $password, false); 
     }
 
     public static function token($username) {
-        return Auth::cek($username, '', ''); 
+        return Auth::cek($username, false, false); 
     }
 }

@@ -8,6 +8,7 @@ use \Psr\Log\LoggerInterface;
 use \Appkita\PHPAuth\Authentication;
 use \Appkita\PHPAuth\METHOD;
 use \Appkita\CI4Restfull\Auth;
+use \Appkita\CI4Restfull\ErrorOutput;
 
 abstract class BaseController extends Controller
 {
@@ -27,6 +28,7 @@ abstract class BaseController extends Controller
 	protected $model;
     private $error_auth = 'Not Authentication';
     protected $allowed_format = ['json', 'xml', 'csv'];
+    protected $format = 'json';
 	/**
 	 * Constructor.
 	 *
@@ -51,19 +53,15 @@ abstract class BaseController extends Controller
             }
         }
         if (!empty($format)) {
-            $this->setFormat($format);
+            if (\in_array(strtolower($format), $this->allowed_format)) {
+                $this->setFormat($format);
+            }
         }
 	}
 
     protected function setAllowedFormat(array $format) {
         $this->allowed_format = $format;
         return $this;
-    }
-
-    private function failOutput($code = 401, $message= '') {
-        \http_response_code($code);
-        echo \json_encode(['status'=>$code, 'message'=>$message]);
-        die();
     }
 
     private function cekAuthType($type = 'key') {
@@ -191,7 +189,7 @@ abstract class BaseController extends Controller
             }
         }
         if (!$status) {
-            return $this->failOutput(401, $this->error_auth);
+            return ErrorOutput::error401();
         }
     }
 

@@ -65,6 +65,7 @@ class Autoload extends AutoloadConfig
 	 */
 	public $classmap = [
 		'Appkita\\CI4Restfull\\RestfullApi' => APPPATH .'Restfull/RestfullApi.php',
-		'Appkita\\CI4Restfull\\Auth' => APPPATH .'Restfull/Auth.php'
+		'Appkita\\CI4Restfull\\Auth' => APPPATH .'Restfull/Auth.php',
+		'Appkita\\CI4Restfull\\ErrorOutput' => APPPATH .'Restfull/ErrorOutput.php'
 	];
 }

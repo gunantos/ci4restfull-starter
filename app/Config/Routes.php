@@ -20,8 +20,10 @@ if (file_exists(SYSTEMPATH . 'Config/Routes.php'))
 $routes->setDefaultNamespace('App\Controllers');
 $routes->setDefaultController('Home');
 $routes->setDefaultMethod('index');
-$routes->setTranslateURIDashes(false);
-$routes->set404Override();
+$routes->setTranslateURIDashes(true);
+$routes->set404Override(function() {
+	return \Appkita\CI4Restfull\ErrorOutput::error404();
+});
 $routes->setAutoRoute(true);
 
 /*
