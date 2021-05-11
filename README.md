@@ -60,7 +60,7 @@ composer update
      ]
     
     //Configuration your Header API KEY
-    public $haderKey = 'X-API-KEY'l
+    public $haderKey = 'X-API-KEY';
     
     //configuration data include on json token
    $token_data = 'username';
