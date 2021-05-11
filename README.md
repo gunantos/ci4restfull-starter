@@ -6,10 +6,18 @@ Codeigniter 4 Restfull is the creation of Restfull API with the codeigniter 4 fr
 ## Installation & updates
 
 Now is Beta Version
+
+- composer
 ```sh
 composer create-project appkita/ci4restfull-starter@v1.0-BETA
+cd ci4restfull-starter
 composer update
 ```
+-manual
+ 1. clone github `git@github.com:gunantos/ci4restfull-starter.git`
+ 2. cd `ci4restful-starter`
+ 3. ``composer install``
+
 
 ## Setup
 
