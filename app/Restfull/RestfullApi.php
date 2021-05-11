@@ -8,10 +8,26 @@ class RestfullApi extends BaseController
     use ResponseTrait;
 
     protected $auth = ['jwt', 'basic', 'digest', 'key'];
+	protected $allowed_format = [];
+	protected $format = 'json';
 
     function __construct() {
-        $this->setAuth($this->auth);
+		$this->init();
     }
+
+	private function init() {
+        $this->setAuth($this->auth);
+		if (sizeof($this->allowed_format) > 0) {
+			$this->setAllowedFormat($this->allowed_format);
+		}
+		if (!empty($format)) {
+			if (\is_array($format)) {
+				$this->setFormat($format[0]);
+			}else{
+				$this->setFormat($format);
+			}
+		}
+	}
 
     /**
 	 * Return an array of resource objects, themselves in array format
@@ -89,21 +105,6 @@ class RestfullApi extends BaseController
 	public function delete($id = null)
 	{
 		return $this->fail(lang('RESTful.notImplemented', ['delete']), 501);
-	}
-
-	/**
-	 * Set/change the expected response representation for returned objects
-	 *
-	 * @param string $format
-	 *
-	 * @return void
-	 */
-	public function setFormat(string $format = 'json')
-	{
-		if (in_array($format, ['json', 'xml'], true))
-		{
-			$this->format = $format;
-		}
 	}
 
 }

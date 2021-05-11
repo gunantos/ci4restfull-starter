@@ -11,9 +11,9 @@ class Restfull extends BaseConfig
     public $cekfrom = 'database';
     
     /**
-     * @var String $file_config 
-     * if you using file cek authentication
-
+     * @var Array $user_config  
+     * Configuration user check
+    */
      public $user_config = [
       'model' => 'RestUser',
       'username_coloumn'=>'email',
@@ -25,33 +25,18 @@ class Restfull extends BaseConfig
       'blacklist_coloumn'=>'blacklist'
     ];
     
-     */
+    
 
     public $RestUser = [
       [
         'email'=>'user@email.com',
         'password'=>'password',
-        'key'=>'123123',
-        'block'=>false,
+        'apikey'=>'123123',
+        'isblock'=>false,
         'whitelist'=>[],
         'blacklist'=>[],
         'path'=>'*'
       ]
-    ];
-     /**
-      * @var string $database_config
-      * insert model user
-      */
-    
-    public $user_config = [
-      'model' => 'UserModel',
-      'username_coloumn'=>'email',
-      'password_coloumn'=>'password',
-      'key_coloumn' => 'apikey',
-      'path_coloumn'=>'path',
-      'block_coloumn'=>'isblock',
-      'whitelist_coloumn'=>'whitelist',
-      'blacklist_coloumn'=>'blacklist'
     ];
 
     /**
@@ -62,4 +47,8 @@ class Restfull extends BaseConfig
     public $headerKey = 'X-TTPG-KEY';
 
     public $token_data = 'username';
+
+    public $allowed_format = ['json', 'xml', 'csv'];
+
+    public $default_format = 'json';
 }

@@ -26,6 +26,7 @@ abstract class BaseController extends Controller
 	 */
 	protected $model;
     private $error_auth = 'Not Authentication';
+    protected $allowed_format = ['json', 'xml', 'csv'];
 	/**
 	 * Constructor.
 	 *
@@ -40,7 +41,24 @@ abstract class BaseController extends Controller
 		// instantiate our model, if needed
 		$this->setModel($this->modelName);
         $this->authentication($this->_auth);
+        $format = $request->getVar('format');
+        $format = empty($format) ? $request->getPost('format') : $format;
+        $format = empty($format) ? $request->getGet('format') : $format;
+        if (empty($format)) {
+            $json = $request->getJSON();
+            if (isset($json->format)) {
+                $format = $json->format;
+            }
+        }
+        if (!empty($format)) {
+            $this->setFormat($format);
+        }
 	}
+
+    protected function setAllowedFormat(array $format) {
+        $this->allowed_format = $format;
+        return $this;
+    }
 
     private function failOutput($code = 401, $message= '') {
         \http_response_code($code);
@@ -152,6 +170,15 @@ abstract class BaseController extends Controller
         if (!empty($config)) {
             $this->setAuth($config);
         }
+        if ($this->_auth == false) {
+            return true;
+        }
+        if (!\is_array($this->_auth)) {
+            $this->_auth = [$this->_auth];
+        }
+        if (sizeof($this->_auth) < 1) {
+            return true;
+        }
         $status = false;
         for($i = 0; $i < sizeof($this->_auth); $i++) {
             $status = $this->cekAuthType($this->_auth[$i]);
@@ -210,4 +237,20 @@ abstract class BaseController extends Controller
 			$this->modelName = get_class($this->model);
 		}
 	}
+
+    	/**
+	 * Set/change the expected response representation for returned objects
+	 *
+	 * @param string $format
+	 *
+	 * @return void
+	 */
+	protected function setFormat(string $format = 'json')
+	{
+		if (in_array($format, ['json', 'xml'], true))
+		{
+			$this->format = $format;
+		}
+	}
+
 }
