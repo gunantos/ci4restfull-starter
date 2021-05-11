@@ -16,6 +16,7 @@ abstract class BaseController extends Controller
      * @var array 
      */
     protected $_auth = ['jwt', 'basic', 'digest', 'key'];
+    protected $auth = [];
     protected $user_api = [];
 	/**
 	 * @var string|null The model that holding this resource's data
@@ -28,7 +29,9 @@ abstract class BaseController extends Controller
 	protected $model;
     private $error_auth = 'Not Authentication';
     protected $allowed_format = ['json', 'xml', 'csv'];
-    protected $format = 'json';
+    protected $mustbe = null;
+
+    private $config = [];
 	/**
 	 * Constructor.
 	 *
@@ -40,23 +43,55 @@ abstract class BaseController extends Controller
 	{
 		parent::initController($request, $response, $logger);
 		// instantiate our model, if needed
+        $this->initConfig();
+        $this->initFormat();
 		$this->setModel($this->modelName);
+        $this->setAuth($this->auth);
         $this->authentication($this->_auth);
-        $format = $request->getVar('format');
-        $format = empty($format) ? $request->getPost('format') : $format;
-        $format = empty($format) ? $request->getGet('format') : $format;
-        if (empty($format)) {
-            $json = $request->getJSON();
-            if (isset($json->format)) {
-                $format = $json->format;
-            }
-        }
-        if (!empty($format)) {
-            if (\in_array(strtolower($format), $this->allowed_format)) {
-                $this->setFormat($format);
-            }
-        }
 	}
+
+    private function initConfig() {
+        $this->config = new \Config\Restfull();
+    }
+
+    protected function initFormat(string $format = null) {
+        if (empty($this->allowed_format) || sizeof($this->allowed_format) < 1) {
+            if (isset($this->config->allowed_format)) {
+                if (!empty($this->config->allowed_format) && sizeof($this->config->allowed_format) > 0) {
+                    $this->setAllowedFormat($this->config->allowed_format);
+                }
+            }
+        }
+        if (\is_string($this->allowed_format)) {
+            $this->allowed_format = [$this->allowed_format];
+        }
+        if (sizeof($this->allowed_format) > 0) {
+			$this->setAllowedFormat($this->allowed_format);
+		}
+        $default_format = 'json';
+        if (isset($this->config->default_format)) {
+            if (empty($this->config->default_format)) {
+                $default_format = $this->config->default_format;
+            }
+        }
+        $this->setFormat($default_format);
+        $formatParam = $this->getFormatParameter();
+        if (!empty($formatParam)) {
+            $default_format = $formatParam;
+        }
+        $this->setFormat($default_format);
+    }
+
+    private function getFormatParameter() {
+        $_format = $this->request->getVar('format');
+        if (empty($_format)) {
+            $json = $this->request->getJSON();
+            if (isset($json->format)) {
+                $_format = $json->format;
+            }
+        }
+        return $_format;
+    }
 
     protected function setAllowedFormat(array $format) {
         $this->allowed_format = $format;
@@ -64,10 +99,9 @@ abstract class BaseController extends Controller
     }
 
     private function cekAuthType($type = 'key') {
-        $config = new \Config\Restfull();
-        $user_config = $config->user_config;
-        $PHPAUTH = new Authentication($config);
-        $auth = Auth::init($config); 
+        $user_config = $this->config->user_config;
+        $PHPAUTH = new Authentication($this->config);
+        $auth = Auth::init($this->config); 
         switch (\strtolower($type)) {
             case 'key':
                 $user=  $PHPAUTH->auth(METHOD::KEY, function($key) {
@@ -124,8 +158,9 @@ abstract class BaseController extends Controller
         if ($list == '*') {
             return true;
         } else if(\is_array($list)) {
-            $class = $this->router->controllerName();
-            $method = $this->router->methodName();
+            $router = service('router');
+            $class = $router->controllerName();
+            $method = $router->methodName();
             $class = \str_replace(' ', '', $class);
             $class = \str_replace(APPPNAMESPACE, '', $class);
             $class = \str_replace('Controllers', '', $class);
@@ -239,7 +274,8 @@ abstract class BaseController extends Controller
 	 */
 	protected function setFormat(string $format = 'json')
 	{
-		if (in_array($format, ['json', 'xml'], true))
+        $format = strtolower(str_replace(' ', '', $format));
+		if (in_array($format, $this->allowed_format, true))
 		{
 			$this->format = $format;
 		}

@@ -8,28 +8,8 @@ class RestfullApi extends BaseController
     use ResponseTrait;
 
     protected $auth = ['jwt', 'basic', 'digest', 'key'];
-	protected $allowed_format = [];
-	protected $format = 'json';
 
-    function __construct() {
-		$this->init();
-    }
-
-	private function init() {
-        $this->setAuth($this->auth);
-		if (sizeof($this->allowed_format) > 0) {
-			$this->setAllowedFormat($this->allowed_format);
-		}
-		if (!empty($format)) {
-			if (\is_array($format)) {
-				$this->setFormat($format[0]);
-			}else{
-				$this->setFormat($format);
-			}
-		}
-	}
-
-    /**
+	/**
 	 * Return an array of resource objects, themselves in array format
 	 *
 	 * @return mixed

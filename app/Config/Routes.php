@@ -21,10 +21,8 @@ $routes->setDefaultNamespace('App\Controllers');
 $routes->setDefaultController('Home');
 $routes->setDefaultMethod('index');
 $routes->setTranslateURIDashes(true);
-$routes->set404Override(function() {
-	return \Appkita\CI4Restfull\ErrorOutput::error404();
-});
-$routes->setAutoRoute(true);
+$routes->set404Override();
+$routes->setAutoRoute(false);
 
 /*
  * --------------------------------------------------------------------
@@ -34,8 +32,6 @@ $routes->setAutoRoute(true);
 
 // We get a performance increase by specifying the default
 // route since we don't have to scan directories.
-$routes->get('/', 'Home::index');
-
 /*
  * --------------------------------------------------------------------
  * Additional Routing
@@ -52,4 +48,8 @@ $routes->get('/', 'Home::index');
 if (file_exists(APPPATH . 'Config/' . ENVIRONMENT . '/Routes.php'))
 {
 	require APPPATH . 'Config/' . ENVIRONMENT . '/Routes.php';
+}
+if (file_exists(APPPATH . 'Restfull/Routes.php'))
+{
+	require APPPATH . 'Restfull/Routes.php';
 }
