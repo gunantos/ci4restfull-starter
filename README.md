@@ -85,54 +85,45 @@ composer update
 
 ```php
   <?php
-    namespace App\Controllers;
-    class Home extends RestfullApi
-    {
-       protected $auth = ['digest', 'basic', 'key', 'token'] //if you using multi authentication on controler
-       /** or
-       * protected $aut = 'basic';
-       */
 
-       protected $modelName = 'YourModelDB';
-       /** or
-        *
-        * protected $model = new App\Models\mymodel;
-       */
-       protected $format = 'json';
+namespace App\Controllers;
+use \Appkita\CI4Restfull\RestfullApi;
+use \App\Models\UserModel;
 
-       public function index {
-          return $this->respond(['status'=>200, 'data'=>$this->model->findAll());
-       }
+class Home extends RestfullApi
+{
+	#protected $modelName = 'UserModel';
+	protected $model;
+    protected $allowed_format = ['json'];
 
-       public function show($id = null)
-       {
-          return $this->respond(['status'=>200, 'data'=>$this->model->find($id));
-       }
+	protected $auth = ['key'];
 
-       /**
-         * Create a new resource object, from "posted" parameters
-         *
-         * @return mixed
-         */
-       public function create(){}
+	function __construct() {
+		$this->model = new UserModel();
+	}
+	public function index()
+	{
+		return $this->respond(['status'=>true, 'data'=>$this->model->findAll()]);
+	}
 
-        /**
-       * Add or update a model resource, from "posted" properties
-       *
-       * @param mixed $id
-       *
-       * @return mixed
-       */
-      public function update($id = null){}
-      /**
-	    * Delete the designated resource object from the model
-	    *
-	    * @param mixed $id
-	    *
-	    * @return mixed
-	    */
-	    public function delete($id = null){}
+	public function show($id = null)
+	{
+		return $this->respond(['status'=>true, 'data'=>$this->model->find($id)]);
+	}
+
+	public function create() {
+		die('create ');
+	}
+
+	public function update($id = null) {
+		die('update '. $id);
+	}
+
+	public function deleted($id = null) {
+		die('deleted '. $id);
+	}
 }
+
 ```
 
 - Run application with `spark` or `host`
