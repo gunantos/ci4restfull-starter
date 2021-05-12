@@ -31,6 +31,10 @@ abstract class BaseController extends Controller
     protected $allowed_format = ['json', 'xml', 'csv'];
     protected $mustbe = null;
 
+    //cache
+    private $_cache_user;
+    private $_cache_api;
+
     private $config = [];
 	/**
 	 * Constructor.
@@ -45,10 +49,29 @@ abstract class BaseController extends Controller
 		// instantiate our model, if needed
         $this->initConfig();
         $this->initFormat();
+        $this->initCache();
 		$this->setModel($this->modelName);
         $this->setAuth($this->auth);
         $this->authentication($this->_auth);
 	}
+
+    function __destruct() {
+        $log = new \Appkita\CI4Restfull\Logging();
+        $log::set($this->config->logging, $this->_cache_user, $this->_cache_api);
+        $log::create();
+    }
+
+    private function initCache() {
+        $router = service('router');
+        $this->_cache_user = new CacheUSER();
+        $this->_cache_api = new CacheAPI();
+        $this->_cache_api->allow_auth = $this->_auth;
+        $this->_cache_api->controller = $router->controllerName();
+        $this->_cache_api->function = $router->methodName();
+        $this->_cache_api->ipaddress = $this->request->getIPAddress();
+        $this->_cache_api->format = $this->format;
+        $this->_cache_api->request = $this->request->getVar() ? $this->request->getVar() : $this->request->getJSON();
+    }
 
     private function initConfig() {
         $this->config = new \Config\Restfull();
