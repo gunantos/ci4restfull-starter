@@ -39,6 +39,7 @@ abstract class BaseController extends Controller
 
     private $start_time;
     private $config = [];
+    
 	/**
 	 * Constructor.
 	 *
