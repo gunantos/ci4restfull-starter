@@ -20,8 +20,8 @@ composer update
 
 -manual
 
-1.  clone github `git@github.com:gunantos/ci4restfull-starter.git`
-2.  cd `ci4restful-starter`
+1.  Download latest release from `https://github.com/gunantos/ci4restfull-starter/releases`
+2.  extract to public_html
 3.  `composer install`
 
 ## Setup
