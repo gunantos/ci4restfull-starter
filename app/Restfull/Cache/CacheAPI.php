@@ -1,7 +1,7 @@
 <?php
-namespace Appkita\CI4Restfull\Enity;
+namespace Appkita\CI4Restfull\Cache;
 
-class CacheAPI extends \CodeIgniter\Enity
+class CacheAPI extends \CodeIgniter\Entity
 {
     protected $attributes = [
         'ipaddress'=>null,

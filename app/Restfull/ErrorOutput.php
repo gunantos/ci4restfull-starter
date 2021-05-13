@@ -58,7 +58,8 @@ class ErrorOutput
         }
         $mime   = "application/{$format}";
         \header('Content-type: '. $mime);
-        die(json_encode($init->output)); 
+        die(json_encode($init->output));
+        exit();
     }
 
     public static function error404(String $description = null) {

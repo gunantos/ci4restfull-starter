@@ -1,12 +1,12 @@
 <?php
-namespace Appkita\CI4Restfull\Enity;
-
-class CacheUSER extends \CodeIgniter\Enity
+namespace Appkita\CI4Restfull\Cache;
+use \CodeIgniter\Entity;
+class CacheUSER extends Entity
 {
-    protected $attributes = [];
+    protected $attributes = ['auth'];
 
     function __construct(array $config) {
-        $this->createAtributes($config);
+        $this->createAttributes($config);
         parent::__construct();
     }
     

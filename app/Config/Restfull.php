@@ -71,6 +71,15 @@ class Restfull extends BaseConfig
      */
     public $default_format = 'json';
 
+    /**
+     * @var array $logging
+     * you can set file or database
+     */
+    public $logging = [
+      'saveto'=>'file',
+      'model'=>'restfull'
+    ];
+
     public $default_message_error = [
       '400' => 'Bad Request',
       '401' => 'Not Authentication',

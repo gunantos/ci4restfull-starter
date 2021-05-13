@@ -9,6 +9,8 @@ use \Appkita\PHPAuth\Authentication;
 use \Appkita\PHPAuth\METHOD;
 use \Appkita\CI4Restfull\Auth;
 use \Appkita\CI4Restfull\ErrorOutput;
+use \Appkita\CI4Restfull\Cache\CacheAPI;
+use \Appkita\CI4Restfull\Cache\CacheUSER;
 
 abstract class BaseController extends Controller
 {
@@ -35,6 +37,7 @@ abstract class BaseController extends Controller
     private $_cache_user;
     private $_cache_api;
 
+    private $start_time;
     private $config = [];
 	/**
 	 * Constructor.
@@ -45,6 +48,7 @@ abstract class BaseController extends Controller
 	 */
 	public function initController(RequestInterface $request, ResponseInterface $response, LoggerInterface $logger)
 	{
+        $this->start_time = microtime(true);
 		parent::initController($request, $response, $logger);
 		// instantiate our model, if needed
         $this->initConfig();
@@ -57,20 +61,25 @@ abstract class BaseController extends Controller
 
     function __destruct() {
         $log = new \Appkita\CI4Restfull\Logging();
-        $log::set($this->config->logging, $this->_cache_user, $this->_cache_api);
+        $log::set($this->config->logging, $this->_cache_api);
         $log::create();
     }
 
     private function initCache() {
         $router = service('router');
-        $this->_cache_user = new CacheUSER();
+        $this->_cache_user = new CacheUSER($this->config->user_config);
         $this->_cache_api = new CacheAPI();
-        $this->_cache_api->allow_auth = $this->_auth;
         $this->_cache_api->controller = $router->controllerName();
         $this->_cache_api->function = $router->methodName();
         $this->_cache_api->ipaddress = $this->request->getIPAddress();
         $this->_cache_api->format = $this->format;
+        $this->_cache_api->start_time = $this->start_time;
         $this->_cache_api->request = $this->request->getVar() ? $this->request->getVar() : $this->request->getJSON();
+        $headers = [];
+        foreach($this->request->getHeaders() as $key) {
+            array_push($headers, ["$key" => $this->request->getHeaderLine($key)]);
+        }
+        $this->_cache_api->header = $headers;
     }
 
     private function initConfig() {
@@ -128,18 +137,38 @@ abstract class BaseController extends Controller
         switch (\strtolower($type)) {
             case 'key':
                 $user=  $PHPAUTH->auth(METHOD::KEY, function($key) {
-                    return Auth::key($key);
+                    $_user = Auth::key($key);
+                    if ($_user) {
+                        $this->_cache_user->auth = 'key';
+                        $this->_cache_api->auth = 'key';
+                        $this->createCacheUser($_user);
+                        return $_user;
+                    } else {
+                        return false;
+                    }
                 });
             break;
             case 'basic':
                 $user = $PHPAUTH->auth(METHOD::BASIC, function($username, $password) {
-                    return Auth::basic($username, $password);
+                    $_user =  Auth::basic($username, $password);
+                    if ($_user) {
+                        $this->_cache_user->auth = 'basic';
+                        $this->_cache_api->auth = 'basic';
+                        $this->createCacheUser($_user);
+                        return $_user;
+                    } else {
+                        return false;
+                    }
                 });
             break;
             case 'digest':
                 $user = $PHPAUTH->auth(METHOD::DIGEST, function($username, $password) {
                     $_user = Auth::digest($username, $password);
                     if ($_user != false) {
+                          
+                        $this->_cache_user->auth = 'digest';
+                        $this->_cache_api->auth = 'digest';
+                          $this->createCacheUser($_user);
                           return ['username'=>$_user[$user_config['username_coloumn']], 'password'=>$_user[$user_config['password_coloumn']]];
                     } else {
                         return false;
@@ -148,17 +177,39 @@ abstract class BaseController extends Controller
             break;
             case 'jwt':
                 $user = $PHPAUTH->auth(METHOD::TOKEN, function($key) {
-                    return Auth::token($key);
+                    $_user = Auth::token($key);
+                    if ($_user) {
+                       
+                        $this->_cache_user->auth = 'jwt';
+                        $this->_cache_api->auth = 'jwt';
+                        $this->createCacheUser($_user);
+                        return $_user;
+                    } else {
+                        return false;
+                    }
                 });
             break;
             default:
              $user=  $PHPAUTH->auth(METHOD::KEY, function($key) {
-                    return Auth::key($key);
+                     $_user = Auth::key($key);
+                    if ($_user) {
+                        
+                        $this->_cache_user->auth = 'key';
+                        $this->_cache_api->auth = 'key';
+                        $this->createCacheUser($_user);
+                        return $_user;
+                    } else {
+                        return false;
+                    }
                 });
         }
         if ($user == false) {
              return ErrorOutput::error401();
         }
+        
+        $this->_cache_api->user = (isset($user[$this->config->user_config['username_coloumn']]) 
+                            ? $user[$this->config->user_config['username_coloumn']]
+                            : '');
         $whitelist = $this->cekWhitelist($user[$user_config['whitelist_coloumn']]);
         if (!$whitelist) {
             if (!$this->cekBlacklist($user[$user_config['blacklist_coloumn']])) {
@@ -174,6 +225,14 @@ abstract class BaseController extends Controller
             }
         } else {
             return ErrorOutput::error401();
+        }
+    }
+
+    private function createCacheUser($user) {
+        if (\is_array($user)) {
+            foreach($user as $key => $value) {
+                $this->_cache_user->{$key} = $value;
+            }
         }
     }
 

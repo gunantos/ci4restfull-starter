@@ -1,25 +1,24 @@
 <?php
 namespace Appkita\CI4Restfull;
-use \Appkita\CI4Restfull\Enity\CacheAPI;
 
 Class Logging {
     public static $user;
     public static $api;
     public static $config;
 
-    public function set(array $config, Api $api) {
+    public static function set(array $config, $api) {
         Logging::$config = $config;
         Logging::$api = $api;
     }
 
     private static function _file() {
-        $path = WRITEPATH . DIRECTORY_SEPERATOR . Logging::$config['model'];
-        if (\file_exists($path)) {
+        $path = WRITEPATH . DIRECTORY_SEPARATOR .'logs'. DIRECTORY_SEPARATOR. Logging::$config['model'];
+        if (!\file_exists($path)) {
             @\mkdir($path, 0777, true);
         }
-        $file = date('Y-m-d') .'_apilog.log';
-        $teks = "[". date('H:i:s') ."] ". \json_encode(Logging::$api->toArray()).PHP_EOL;
-        file_put_contents($file, $teks, FILE_APPEND);
+        $file = $path .DIRECTORY_SEPARATOR. date('Y-m-d') .'.log';
+        $teks = "[". date('H:i:s') ."] ". \json_encode(Logging::$api->toArray());
+        file_put_contents($file, $teks . PHP_EOL, FILE_APPEND);
     }
 
     private static function _database() {
@@ -39,7 +38,7 @@ Class Logging {
     }
 
     public static function create() {
-        Logging::$api->end_time = time();
+        Logging::$api->end_time = microtime(true);
         if (Logging::$config['saveto'] == 'database') {
             Logging::_database();
         } else {
