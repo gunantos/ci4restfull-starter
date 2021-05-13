@@ -80,6 +80,23 @@ class Restfull extends BaseConfig
       'model'=>'restfull'
     ];
 
+    /**
+     * @var bool $automatic_api
+     * if you wont create automatic API
+     */
+
+    public $automatic_api = false;
+
+    /**
+     * @var array $automatic_configuration | file or database
+     * if you set file change model to Configuration Name. sensitive case
+     */
+    public $automatic_configuration = [
+        'from'=>'file', //or database
+        'model'=>'RestfullAutoList', //if you se
+    ];
+
+
     public $default_message_error = [
       '400' => 'Bad Request',
       '401' => 'Not Authentication',
