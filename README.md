@@ -143,7 +143,4 @@ class Home extends RestfullApi
 
 # Sponsor
 
-[Pay Coffe](https://invoice.xendit.co/donation/appkita) <br>
-atau<br>
-If you like this please sponsor me by scan QR <br>
-<img src="https://app-kita.com/sponsor.png" width="150" title="Pay coffe"/>
+[Pay Coffe](sponsor.app-kita.net)
