@@ -1,6 +1,10 @@
 <a href="https://app-kita.com" alt="app-kita, app kita"><img src="https://app-kita.com/img/logo-teks.965d24bf.png" width="100"></a><br>
 
-![AppVeyor](https://img.shields.io/appveyor/build/gunantos/ci4restfull-starter) <a href="https://sponsor.app-kita.net" target="_blank"><img src="https://img.shields.io/github/sponsors/gunantos?logo=gunantos&style=for-the-badge" title="Pay Coffe" /></a><br>
+[![GitHub stars](https://img.shields.io/github/stars/gunantos/ci4restfull-starter)](https://github.com/gunantos/ci4restfull-starter/stargazers)
+[![GitHub issues](https://img.shields.io/github/issues/gunantos/ci4restfull-starter)](https://github.com/gunantos/ci4restfull-starter/issues)
+[![GitHub forks](https://img.shields.io/github/forks/gunantos/ci4restfull-starter)](https://github.com/gunantos/ci4restfull-starter/network)
+[![GitHub license](https://img.shields.io/github/license/gunantos/ci4restfull-starter)](https://github.com/gunantos/ci4restfull-starter/blob/main/LICENSE)
+<a href="https://sponsor.app-kita.net" target="_blank"><img src="https://img.shields.io/github/sponsors/gunantos?logo=gunantos&style=for-the-badge" title="Pay Coffe" /></a><br>
 # CodeIgniter 4 Restfull API Application Starter
 
 Codeigniter 4 Restfull is the creation of Restfull API with the codeigniter 4 framework. Use is very simple and easy to use. And support with 4 types of security authentication ex. JWT, Basic, Key, Token
