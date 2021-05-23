@@ -1,8 +1,7 @@
 <a href="https://app-kita.com" alt="app-kita, app kita"><img src="https://app-kita.com/img/logo-teks.965d24bf.png" width="100"></a><br>
+[![PHP Composer](https://github.com/gunantos/ci4restfull-starter/actions/workflows/php.yml/badge.svg)](https://github.com/gunantos/ci4restfull-starter/actions/workflows/php.yml)
 ![Discord](https://img.shields.io/discord/846036920811126844?style=plastic)
-[![GitHub stars](https://img.shields.io/github/stars/gunantos/ci4restfull-starter)](https://github.com/gunantos/ci4restfull-starter/stargazers)
 [![GitHub issues](https://img.shields.io/github/issues/gunantos/ci4restfull-starter)](https://github.com/gunantos/ci4restfull-starter/issues)
-[![GitHub forks](https://img.shields.io/github/forks/gunantos/ci4restfull-starter)](https://github.com/gunantos/ci4restfull-starter/network)
 [![GitHub license](https://img.shields.io/github/license/gunantos/ci4restfull-starter)](https://github.com/gunantos/ci4restfull-starter/blob/main/LICENSE)<br>
 <a href="https://sponsor.app-kita.net" target="_blank"><img src="https://img.shields.io/github/sponsors/gunantos?logo=gunantos&style=for-the-badge" title="Pay Coffe" /></a><br>
 # CodeIgniter 4 Restfull API Application Starter
