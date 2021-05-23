@@ -13,6 +13,10 @@ You can manage api using database or File configuration
 
 follow Setup Configuration!
 
+## Chat
+(Discord)[https://discord.gg/bXUWCSaw]
+
+
 ## Installation & updates
 
 - composer
