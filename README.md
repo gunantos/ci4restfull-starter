@@ -143,4 +143,4 @@ class Home extends RestfullApi
 
 # Sponsor
 
-[Pay Coffe](sponsor.app-kita.net)
+[Pay Coffe](https://sponsor.app-kita.net)
