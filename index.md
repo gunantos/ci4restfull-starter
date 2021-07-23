@@ -1,37 +1,154 @@
-## Welcome to GitHub Pages
+<a href="https://app-kita.com" alt="app-kita, app kita"><img src="https://app-kita.com/img/logo-teks.965d24bf.png" width="100"></a><br>
+[![PHP Composer](https://github.com/gunantos/ci4restfull-starter/actions/workflows/php.yml/badge.svg)](https://github.com/gunantos/ci4restfull-starter/actions/workflows/php.yml)
+![Discord](https://img.shields.io/discord/846036920811126844?style=plastic)
+[![GitHub issues](https://img.shields.io/github/issues/gunantos/ci4restfull-starter)](https://github.com/gunantos/ci4restfull-starter/issues)
+[![GitHub license](https://img.shields.io/github/license/gunantos/ci4restfull-starter)](https://github.com/gunantos/ci4restfull-starter/blob/main/LICENSE)<br>
+<a href="https://sponsor.app-kita.net" target="_blank"><img src="https://img.shields.io/github/sponsors/gunantos?logo=gunantos&style=for-the-badge" title="Pay Coffe" /></a><br>
+# CodeIgniter 4 Restfull API Application Starter
 
-You can use the [editor on GitHub](https://github.com/gunantos/ci4restfull-starter/edit/gh-pages/index.md) to maintain and preview the content for your website in Markdown files.
+Codeigniter 4 Restfull is the creation of Restfull API with the codeigniter 4 framework. Use is very simple and easy to use. And support with 4 types of security authentication ex. JWT, Basic, Key, Token
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+You can manage api using database or File configuration
 
-### Markdown
+follow Setup Configuration!
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+## Chat
+[Discord](https://discord.gg/bXUWCSaw)
 
-```markdown
-Syntax highlighted code block
 
-# Header 1
-## Header 2
-### Header 3
+## Installation & updates
 
-- Bulleted
-- List
+- composer
 
-1. Numbered
-2. List
-
-**Bold** and _Italic_ and `Code` text
-
-[Link](url) and ![Image](src)
+```sh
+composer create-project appkita/ci4restfull-starter
+cd ci4restfull-starter
+composer update
 ```
 
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
+-manual
 
-### Jekyll Themes
+1.  Download latest release from `https://github.com/gunantos/ci4restfull-starter/releases`
+2.  extract to public_html
+3.  `composer install`
 
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/gunantos/ci4restfull-starter/settings/pages). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
+## Setup
 
-### Support or Contact
+- Copy `env` to `.env` and tailor for your app, specifically the baseURL, any database settings and Restfull setting.
 
-Having trouble with Pages? Check out our [documentation](https://docs.github.com/categories/github-pages-basics/) or [contact support](https://support.github.com/contact) and we’ll help you sort it out.
+`or`
+
+- Open Folder `App/Config/Restfull` and edit
+
+```php
+   //you can set database of file
+   public $cekfrom = 'file'
+
+   //configuration user cek
+  public $user_config = [
+      'model' => 'UserModel', //model name or parameter if you using file
+      'username_coloumn'=>'email',
+      'password_coloumn'=>'password',
+      'key_coloumn' => 'apikey',
+      'path_coloumn'=>'path',
+      'block_coloumn'=>'isblock',
+      'whitelist_coloumn'=>'whitelist',
+      'blacklist_coloumn'=>'blacklist'
+    ];
+
+    //if you using file $cekfrom
+    $UserModel = [
+   	[
+        'email'=>'user@email.com',
+        'password'=>'password',
+        'apikey'=>'123123',
+        'isblock'=>false,  //if you block return true
+        'whitelist'=>[], //add whitelist ip address
+        'blacklist'=>[], //add blacklist ip address
+        'path'=>'*' //use * for allow all access or array controllername_methodname
+      ]
+     ]
+
+    //Configuration your Header API KEY
+    public $haderKey = 'X-API-KEY';
+
+    /**
+     * @var array $allowed_key_parameter
+     * if you API KEY allowed get from parameter GET, POST, or JSON
+     */
+    public $allowed_key_parameter = ['get', 'post', 'json'];
+    //configuration data include on json token
+   $token_data = 'username';
+
+   public $allowed_format = ['json', 'xml', 'csv'];
+
+    /**
+     * @var string $default_format
+     */
+    public $default_format = 'json';
+
+```
+
+- Create new Controller extends `RestfullApi`
+
+```php
+  <?php
+
+namespace App\Controllers;
+use \Appkita\CI4Restfull\RestfullApi;
+use \App\Models\UserModel;
+
+class Home extends RestfullApi
+{
+	#protected $modelName = 'UserModel';
+	protected $model;
+    protected $allowed_format = ['json'];
+
+	protected $auth = ['key'];
+
+	function __construct() {
+		$this->model = new UserModel();
+	}
+	public function index()
+	{
+		return $this->respond(['status'=>true, 'data'=>$this->model->findAll()]);
+	}
+
+	public function show($id = null)
+	{
+		return $this->respond(['status'=>true, 'data'=>$this->model->find($id)]);
+	}
+
+	public function create() {
+		die('create ');
+	}
+
+	public function update($id = null) {
+		die('update '. $id);
+	}
+
+	public function deleted($id = null) {
+		die('deleted '. $id);
+	}
+}
+
+```
+
+- Run application with `spark` or `host`
+
+```sh
+  //spark
+  php spark serve
+```
+
+- acess api
+  `http://localhost:8080` spark run
+  `http://localhost/yourapi/public` xamp or wamp
+
+## Important
+
+**Please** read the user guide of [Codeigniter 4](https://codeigniter.com/user_guide/)
+
+# Sponsor
+
+[Pay Coffe](https://sponsor.app-kita.net)
