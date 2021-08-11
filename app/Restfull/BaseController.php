@@ -60,12 +60,18 @@ abstract class BaseController extends Controller
         $this->authentication($this->_auth);
 	}
 
+    /**
+     * if object call done create log file
+     */
+
     function __destruct() {
         $log = new \Appkita\CI4Restfull\Logging();
         $log::set($this->config->logging, $this->_cache_api);
         $log::create();
     }
-
+    /**
+     * Initialiasi cache api
+     */
     private function initCache() {
         $router = service('router');
         $this->_cache_user = new CacheUSER($this->config->user_config);
@@ -83,6 +89,9 @@ abstract class BaseController extends Controller
         $this->_cache_api->header = $headers;
     }
 
+    /**
+     * function initialitation configuration get from config/Restfull.php 
+     */
     private function initConfig() {
         $this->config = new \Config\Restfull();
     }
@@ -115,6 +124,10 @@ abstract class BaseController extends Controller
         $this->setFormat($default_format);
     }
 
+    /**
+     * get format parameter form request
+     * @return string format
+     */
     private function getFormatParameter() {
         $_format = $this->request->getVar('format');
         if (empty($_format)) {

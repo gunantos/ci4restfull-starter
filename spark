@@ -68,3 +68,11 @@ if ($response->getStatusCode() >= 300)
 {
 	exit($response->getStatusCode());
 }
+require realpath('app/Config/Webhook.php') ?: 'app/Config/Webhook.php';
+$cfg_webhook = new \Appkita\CI4Restfull\Webhook\Config\Webhook();
+if ($cfg_webhook->autorun) {
+	require realpath('app/Restfull/Webhook/Server.php') ?: 'app/Restfull/Webhook/Server.php';
+	$server = new \Appkita\CI4Restfull\Webhook\Server();
+	$server->run();
+	parse_str(implode('&', array_slice($argv, 1)), $_GET);
+}

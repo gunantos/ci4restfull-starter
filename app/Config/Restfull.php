@@ -74,6 +74,8 @@ class Restfull extends BaseConfig
     /**
      * @var array $logging
      * you can set file or database
+     * if you set database model is model name log class ex: Model/RestLogModel.php
+     * if you set file model is folder name log in %WRITEPATH%
      */
     public $logging = [
       'saveto'=>'file',

@@ -13,9 +13,25 @@ class UserModel extends Model
     protected $useTimestamps = true;
     protected $returnType     = 'array';
     protected $useSoftDeletes = true;
+    protected $allowedFields = [];
     protected $createdField  = 'created';
     protected $updatedField  = 'updated';
     protected $deletedField  = 'deleted';
+
+    public function __construct(ConnectionInterface &$db = null, ValidationInterface $validation = null) {
+        $this->create_allowed_field();
+        parent::__construct($db, $validation);
+    }
+
+    //create automatic allowed field from config
+    private function create_allowed_field() {
+        $cfg = new \Config\Restfull();
+        foreach($cfg->user_config as $key => $value) {
+            if ($key != 'model'){
+                array_push($this->allowedFields, $value);
+            }
+        }
+    }
 
     protected function beforeInsert(array $data): array
     {
