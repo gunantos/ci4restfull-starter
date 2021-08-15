@@ -1,25 +1,24 @@
 <?php
-
-namespace Appkita\CI4Restfull;
+namespace Appkita\CI4Restfull\Auth;
 use \Appkita\CI4Restfull\ErrorOutput;
 
-Class Auth {
+class Cek {
     private static $base_config = [];
     private static $db = false;
     private static $config = '';
     
     public static function init($config) {
-        Auth::$config = $config->user_config;
-        Auth::$base_config = $config;
+        Cek::$config = $config->user_config;
+        Cek::$base_config = $config;
         if ($config->cekfrom == 'database') {
-            Auth::$db = true;
+            Cek::$db = true;
         } else {
-            Auth::$db = false;
+            Cek::$db = false;
         }
     }
 
     private static function dbCek($username=false, $password =false, $key =false) {
-        $config = Auth::$config;
+        $config = Cek::$config;
         $mdl_name = "\\App\Models\\". $config['model'];
         $db = new $mdl_name();
         $db->asArray();
@@ -54,8 +53,8 @@ Class Auth {
     }
 
     private static function fileCek($username=false, $password=false, $key =false) {
-        $config = Auth::$config;
-        $user_list = Auth::$base_config->{$config['model']};
+        $config = Cek::$config;
+        $user_list = Cek::$base_config->{$config['model']};
         if ($username) {
             $indeks = array_search($username, array_column($user_list, $config['username_coloumn']));
         } else if ($key) {
@@ -78,26 +77,26 @@ Class Auth {
     }
 
     private static function cek($username='', $password='', $key='') {
-        if (Auth::$db) {
-            return Auth::dbCek($username, $password, $key);
+        if (Cek::$db) {
+            return Cek::dbCek($username, $password, $key);
         } else {
-            return Auth::fileCek($username, $password, $key);
+            return Cek::fileCek($username, $password, $key);
         }
     }
 
     public static function key($key) {
-        return Auth::cek(false, false, $key);
+        return Cek::cek(false, false, $key);
     }
 
     public static function basic($username, $password) {
-        return Auth::cek($username, $password, false); 
+        return Cek::cek($username, $password, false); 
     }
 
     public static function digest($username, $password = null) {
-        return Auth::cek($username, $password, false); 
+        return Cek::cek($username, $password, false); 
     }
 
     public static function token($username) {
-        return Auth::cek($username, false, false); 
+        return Cek::cek($username, false, false); 
     }
 }

@@ -5,10 +5,8 @@ use \CodeIgniter\Controller;
 use \CodeIgniter\HTTP\RequestInterface;
 use \CodeIgniter\HTTP\ResponseInterface;
 use \Psr\Log\LoggerInterface;
-use \Appkita\PHPAuth\Authentication;
-use \Appkita\PHPAuth\METHOD;
-use \Appkita\CI4Restfull\Auth;
 use \Appkita\CI4Restfull\ErrorOutput;
+use Appkita\CI4Restfull\Auth\BaseAuth;
 use \Appkita\CI4Restfull\Cache\CacheAPI;
 use \Appkita\CI4Restfull\Cache\CacheUSER;
 
@@ -51,24 +49,19 @@ abstract class BaseController extends Controller
 	{
         $this->start_time = microtime(true);
 		parent::initController($request, $response, $logger);
-		// instantiate our model, if needed
-        $this->initConfig();
+		 /**
+         * function initialitation configuration get from config/Restfull.php 
+         */
+        $this->config = new \Config\Restfull();
         $this->initFormat();
-        $this->initCache();
+        //initialisasi model
 		$this->setModel($this->modelName);
-        $this->setAuth($this->auth);
-        $this->authentication($this->_auth);
+        $this->initCache();
+        $auth = new BaseAuth($this->auth, $this->config, false);
+        $auth->init($this->_cache_api, $this->_cache_user);
 	}
 
-    /**
-     * if object call done create log file
-     */
-
-    function __destruct() {
-        $log = new \Appkita\CI4Restfull\Logging();
-        $log::set($this->config->logging, $this->_cache_api);
-        $log::create();
-    }
+    
     /**
      * Initialiasi cache api
      */
@@ -90,10 +83,13 @@ abstract class BaseController extends Controller
     }
 
     /**
-     * function initialitation configuration get from config/Restfull.php 
+     * if object call done create log file
      */
-    private function initConfig() {
-        $this->config = new \Config\Restfull();
+
+    function __destruct() {
+        $log = new \Appkita\CI4Restfull\Logging();
+        $log::set($this->config->logging, $this->_cache_api);
+        $log::create();
     }
 
     protected function initFormat(string $format = null) {
@@ -144,190 +140,6 @@ abstract class BaseController extends Controller
         return $this;
     }
 
-    private function cekAuthType($type = 'key') {
-        $user_config = $this->config->user_config;
-        $PHPAUTH = new Authentication($this->config);
-        $auth = Auth::init($this->config); 
-        switch (\strtolower($type)) {
-            case 'key':
-                $user=  $PHPAUTH->auth(METHOD::KEY, function($key) {
-                    $_user = Auth::key($key);
-                    if ($_user) {
-                        $this->_cache_user->auth = 'key';
-                        $this->_cache_api->auth = 'key';
-                        $this->createCacheUser($_user);
-                        return $_user;
-                    } else {
-                        return false;
-                    }
-                });
-            break;
-            case 'basic':
-                $user = $PHPAUTH->auth(METHOD::BASIC, function($username, $password) {
-                    $_user =  Auth::basic($username, $password);
-                    if ($_user) {
-                        $this->_cache_user->auth = 'basic';
-                        $this->_cache_api->auth = 'basic';
-                        $this->createCacheUser($_user);
-                        return $_user;
-                    } else {
-                        return false;
-                    }
-                });
-            break;
-            case 'digest':
-                $user = $PHPAUTH->auth(METHOD::DIGEST, function($username, $password) {
-                    $_user = Auth::digest($username, $password);
-                    if ($_user != false) {
-                          
-                        $this->_cache_user->auth = 'digest';
-                        $this->_cache_api->auth = 'digest';
-                          $this->createCacheUser($_user);
-                          return ['username'=>$_user[$user_config['username_coloumn']], 'password'=>$_user[$user_config['password_coloumn']]];
-                    } else {
-                        return false;
-                    }
-                });
-            break;
-            case 'jwt':
-                $user = $PHPAUTH->auth(METHOD::TOKEN, function($key) {
-                    $_user = Auth::token($key);
-                    if ($_user) {
-                       
-                        $this->_cache_user->auth = 'jwt';
-                        $this->_cache_api->auth = 'jwt';
-                        $this->createCacheUser($_user);
-                        return $_user;
-                    } else {
-                        return false;
-                    }
-                });
-            break;
-            default:
-             $user=  $PHPAUTH->auth(METHOD::KEY, function($key) {
-                     $_user = Auth::key($key);
-                    if ($_user) {
-                        
-                        $this->_cache_user->auth = 'key';
-                        $this->_cache_api->auth = 'key';
-                        $this->createCacheUser($_user);
-                        return $_user;
-                    } else {
-                        return false;
-                    }
-                });
-        }
-        if ($user == false) {
-             return ErrorOutput::error401();
-        }
-        
-        $this->_cache_api->user = (isset($user[$this->config->user_config['username_coloumn']]) 
-                            ? $user[$this->config->user_config['username_coloumn']]
-                            : '');
-        $whitelist = $this->cekWhitelist($user[$user_config['whitelist_coloumn']]);
-        if (!$whitelist) {
-            if (!$this->cekBlacklist($user[$user_config['blacklist_coloumn']])) {
-                return ErrorOutput::error401('Is IP Adress blacklist from sistem, contact Administrator System');
-            }
-        }
-        if ($this->cekPath($user[$user_config['path_coloumn']])) {
-            $this->user_api = $user;
-            if (\strtolower($type) == 'digest') {
-                return ['username'=>$user[$user_config['username_coloumn']], 'password'=>$user[$user_config['password_coloumn']]];
-            } else {
-                return $this->user_api;
-            }
-        } else {
-            return ErrorOutput::error401();
-        }
-    }
-
-    private function createCacheUser($user) {
-        if (\is_array($user)) {
-            foreach($user as $key => $value) {
-                $this->_cache_user->{$key} = $value;
-            }
-        }
-    }
-
-    private function cekPath($list) {
-        if ($list == '*') {
-            return true;
-        } else if(\is_array($list)) {
-            $router = service('router');
-            $class = $router->controllerName();
-            $method = $router->methodName();
-            $class = \str_replace(' ', '', $class);
-            $class = \str_replace(APPPNAMESPACE, '', $class);
-            $class = \str_replace('Controllers', '', $class);
-            $class = \str_replace('controllers', '', $class);
-            $class = \str_replace('\\', '', $class);
-            $path = $class.'_'.$method;
-            if (\in_array(\strtolower($path), $list)) {
-                return true;
-            } else {
-                return false;
-            }
-        } else {
-            return false;
-        }
-    }
-
-    private function cekBlacklist($list) {
-        $ip = $this->request->getIPAddress();
-        if (\in_array($ip, $list)) {
-            return false;
-        } else {
-            return true;
-        }
-    }
-
-    private function cekWhitelist($list) {
-        $ip = $this->request->getIPAddress();
-        if (\in_array($ip, $list)) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    protected function authentication($config = null) {
-        if (!empty($config)) {
-            $this->setAuth($config);
-        }
-        if ($this->_auth == false) {
-            return true;
-        }
-        if (!\is_array($this->_auth)) {
-            $this->_auth = [$this->_auth];
-        }
-        if (sizeof($this->_auth) < 1) {
-            return true;
-        }
-        $status = false;
-        $i = 0;
-        while($status == false && $i < sizeof($this->_auth)) {
-            $status = $this->cekAuthType($this->_auth[$i]);
-            $i++;
-        }
-        if ($status) {
-            $this->user_api = $status;
-            return true;
-        } else {
-            return ErrorOutput::error401();
-        }
-    }
-
-    protected function setAuth($auth) {
-        if (\is_string($auth)) {
-            $this->_auth = [$auth];
-        }else if (\is_object($auth)) {
-            $this->_auth = (array) $auth;
-        } else{
-            $this->_auth = $auth;
-        }
-        return $this;
-    }
 	/**
 	 * Set or change the model this controller is bound to.
 	 * Given either the name or the object, determine the other.
@@ -376,5 +188,4 @@ abstract class BaseController extends Controller
 			$this->format = $format;
 		}
 	}
-
 }

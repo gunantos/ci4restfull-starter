@@ -1,6 +1,8 @@
 <?php
 namespace Appkita\CI4Restfull;
 
+use \Appkita\CI4Restfull\Cache\CacheAPI;
+
 Class Logging {
     public static $user;
     public static $api;
@@ -38,11 +40,27 @@ Class Logging {
     }
 
     public static function create() {
+        if (empty(Logging::$api)) {
+            Logging::$api = Logging::initCache();
+        }
         Logging::$api->end_time = microtime(true);
         if (Logging::$config['saveto'] == 'database') {
             Logging::_database();
         } else {
             Logging::_file();
         }
+    }
+
+    private static function initCache() {
+        $router = service('router');
+        $cache = new CacheAPI();
+        $cache->controller = $router->controllerName();
+        $cache->function = $router->methodName();
+        $cache->ipaddress = '';
+        $cache->format = '';
+        $cache->start_time = \microtime(true);
+        $cache->request = null;
+        $cache->header = [];
+        return $cache;
     }
 }
